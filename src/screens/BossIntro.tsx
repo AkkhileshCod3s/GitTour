@@ -23,7 +23,7 @@ export function BossIntro({ title, lang, onDone }: { title: string; accent: stri
       aria-label={t(STRINGS.boss.alert, lang)}
       style={{ background: 'var(--scrim)' }}
     >
-      <div className="text-center bg-brut-panel border-4 border-lime rounded-brut-lg shadow-brut px-10 py-8 anim-pop">
+      <div className="text-center bg-brut-panel border-4 border-lime rounded-brut-lg shadow-brut px-5 sm:px-10 py-6 sm:py-8 anim-pop max-w-[92vw]">
         <div className="flex justify-center mb-3">
           <Mascot mood="worried" size={72} />
         </div>
@@ -33,7 +33,7 @@ export function BossIntro({ title, lang, onDone }: { title: string; accent: stri
         <p className={`font-display text-4xl ${phase === 0 ? 'hidden' : ''}`} style={{ color: 'rgb(var(--danger))' }}>
           {t(STRINGS.boss.warn, lang)}
         </p>
-        <p className={`font-display text-3xl tracking-wide ${phase === 0 ? 'hidden' : ''}`} style={{ color: 'rgb(var(--danger))' }}>
+        <p className={`font-display text-2xl sm:text-3xl tracking-wide ${phase === 0 ? 'hidden' : ''}`} style={{ color: 'rgb(var(--danger))' }}>
           {t(STRINGS.boss.level, lang)}
         </p>
         <h2 className="mt-4 font-display text-xl text-lime">{title}</h2>

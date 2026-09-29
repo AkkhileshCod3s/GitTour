@@ -51,7 +51,6 @@ export function BadgeGrid({ progress, levelsCount, completedCount, lang, onReset
           <Stat label={t(STRINGS.profile.stars, lang)} value={`${totalStars(progress)}/${levelsCount * 3}`} color="rgb(var(--lime))" />
           <Stat label={t(STRINGS.profile.streakLabel, lang)} value={String(progress.streak)} color="rgb(var(--danger))" />
         </div>
-
         <div>
           <p className="font-display text-sm text-ink-mid mb-2">
             {t(STRINGS.profile.progress, lang)}{completedCount}/{levelsCount} {t(STRINGS.profile.levels, lang)}
@@ -72,16 +71,16 @@ export function BadgeGrid({ progress, levelsCount, completedCount, lang, onReset
                 >
                   <p className="flex justify-center" aria-hidden="true">{unlocked ? ICONS[b.icon] : <IconQuestion size={26} className="text-ink-low" />}</p>
                   <p className="font-display text-xs mt-1 text-brut-ink break-words" style={{ color: 'rgb(var(--ink-hi))' }}>{b.name.toUpperCase()}</p>
-                  <p className="text-[11px] text-ink-mid mt-1 leading-snug">{unlocked ? b.desc : t(STRINGS.profile.lockedBadge, lang)}</p>
+                  <p className="text-[11px] sm:text-xs text-ink-mid mt-1 leading-snug">{unlocked ? b.desc : t(STRINGS.profile.lockedBadge, lang)}</p>
                 </div>
               )
             })}
           </div>
         </div>
 
-        <div className="pt-4 border-t-3 border-theme flex items-center justify-between gap-3">
+        <div className="pt-4 border-t-3 border-theme flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-xs text-ink-low font-bold">{t(STRINGS.profile.danger, lang)}</p>
-          <Button size="sm" variant="danger" onClick={onResetAll}>{t(STRINGS.profile.resetAll, lang)}</Button>
+          <Button size="sm" variant="danger" className="sm:self-auto self-stretch" onClick={onResetAll}>{t(STRINGS.profile.resetAll, lang)}</Button>
         </div>
       </div>
     </div>

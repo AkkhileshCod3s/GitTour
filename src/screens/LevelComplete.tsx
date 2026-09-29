@@ -104,10 +104,10 @@ export function LevelComplete({ level, explanation, stars, xp, badges, hasNext, 
           </div>
         )}
 
-        <div className="flex flex-wrap justify-center gap-2 mt-4">
-          {hasNext && <Button variant="primary" onClick={onNext}>{t(STRINGS.complete.next, lang)}</Button>}
-          <Button variant="secondary" onClick={onRetry}>{t(STRINGS.complete.retry, lang)}</Button>
-          <Button variant="secondary" onClick={onExit}>{t(STRINGS.complete.map, lang)}</Button>
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-4 sticky bottom-0 bg-brut-panel pt-3 pb-1 -mx-2 px-2">
+          {hasNext && <Button variant="primary" className="flex-1 sm:flex-none" onClick={onNext}>{t(STRINGS.complete.next, lang)}</Button>}
+          <Button variant="secondary" className="flex-1 sm:flex-none" onClick={onRetry}>{t(STRINGS.complete.retry, lang)}</Button>
+          <Button variant="secondary" className="flex-1 sm:flex-none" onClick={onExit}>{t(STRINGS.complete.map, lang)}</Button>
         </div>
       </div>
     </div>

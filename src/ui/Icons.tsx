@@ -24,6 +24,7 @@ export {
   Target as IconTarget,
   Book as IconBook,
   Crown as IconCrown,
+  GitBranch as IconGitBranch,
   Lock as IconLock,
   Play as IconPlay,
   RotateCcw as IconRetry,

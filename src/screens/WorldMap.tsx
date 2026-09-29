@@ -36,7 +36,7 @@ export function WorldMap({ levels, progress, lang, onPlay }: Props) {
         {/* heading with mascot accent */}
         <div className="flex items-center gap-3 mb-8">
           <Mascot mood="idle" size={44} />
-          <h1 className="font-display text-2xl sm:text-3xl text-lime">{t(STRINGS.map.title, lang)}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl text-lime min-w-0">{t(STRINGS.map.title, lang)}</h1>
         </div>
 
         <div className="relative pl-2">
@@ -76,8 +76,8 @@ export function WorldMap({ levels, progress, lang, onPlay }: Props) {
                     </div>
                   </div>
 
-                  {/* level rows on the path */}
-                  <div className="mt-4 ml-[70px] space-y-4">
+                  {/* level rows on the path — indent shrinks on small phones so rows keep full width */}
+                  <div className="mt-4 ml-[70px] pl-0 max-[420px]:ml-10 space-y-4">
                     {wLevels.map((l, li) => {
                       const st = stateOf(l)
                       const locked = st === 'locked'

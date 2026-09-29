@@ -33,6 +33,17 @@ body {
   color: rgb(var(--ink-hi));
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile: keep tap targets comfortable without touching desktop sizing */
+@media (max-width: 767px) {
+  button,
+  a,
+  [role='tab'] {
+    touch-action: manipulation;
+  }
 }
 
 .border-theme {

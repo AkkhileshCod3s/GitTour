@@ -52,10 +52,10 @@ function PathArt() {
   )
 }
 
-/** Floating demo card: mini terminal + mini commit graph + XP badge. */
+/** Floating demo card: mini terminal + mini commit graph + XP badge. Scales down on mobile. */
 function PreviewCard() {
   return (
-    <div className="relative anim-float-card">
+    <div className="relative anim-float-card max-w-full">
       <div className="bg-brut-panel border-4 border-lime rounded-brut-lg shadow-key overflow-hidden">
         <div className="flex items-center gap-1.5 px-3 py-2 bg-lime">
           <span className="w-3 h-3 rounded-full border-2" style={{ borderColor: '#0A0A0A', background: 'rgb(var(--danger))' }} />
@@ -63,7 +63,7 @@ function PreviewCard() {
           <span className="w-3 h-3 rounded-full border-2" style={{ borderColor: '#0A0A0A', background: '#F5F5F2' }} />
           <span className="ml-1 font-display text-xs" style={{ color: '#0A0A0A' }}>TIME TERMINAL</span>
         </div>
-        <div className="p-4 font-mono text-[12.5px] leading-relaxed" style={{ backgroundColor: '#101013' }}>
+        <div className="p-4 font-mono text-[12.5px] leading-relaxed overflow-x-auto" style={{ backgroundColor: '#101013' }}>
           <p><span className="text-lime">$</span> <span style={{ color: '#F5F5F2' }}>git switch -c feature</span></p>
           <p style={{ color: '#CAD0C2' }}>Switched to a new branch 'feature'</p>
           <p className="mt-1"><span className="text-lime">$</span> <span style={{ color: '#F5F5F2' }}>git commit -m "time jump"</span></p>
@@ -88,7 +88,7 @@ function PreviewCard() {
           </div>
         </div>
       </div>
-      <div className="absolute -top-9 -right-4 bg-brut-panel border-3 border-lime rounded-brut shadow-key-sm p-1.5">
+      <div className="absolute -top-9 -right-2 sm:-right-4 bg-brut-panel border-3 border-lime rounded-brut shadow-key-sm p-1.5">
         <Mascot mood="happy" size={44} />
       </div>
     </div>
@@ -106,8 +106,8 @@ export function TitleScreen({ hasProgress, onStart, onContinue, onOpenMap, lang,
       {/* HERO: two columns */}
       <section className="relative flex-1 px-4 py-5 md:py-7 overflow-hidden">
         <PathArt />
-        <div className="relative z-10 max-w-6xl mx-auto grid lg:grid-cols-[1.15fr_1fr] gap-10 items-center">
-          <div>
+        <div className="relative z-10 max-w-6xl mx-auto flex flex-col lg:grid lg:grid-cols-[1.15fr_1fr] gap-8 lg:gap-10 items-center">
+          <div className="w-full">
             <h1 className="font-display leading-[1.02] text-4xl sm:text-5xl xl:text-6xl" style={{ color: 'rgb(var(--ink-hi))' }}>
               {t(STRINGS.landing.heroLine1, lang)}
               <br />
@@ -117,18 +117,19 @@ export function TitleScreen({ hasProgress, onStart, onContinue, onOpenMap, lang,
             <p className="mt-4 text-base sm:text-lg text-ink-mid max-w-xl leading-relaxed">
               {t(STRINGS.landing.heroSub, lang)}
             </p>
-            {/* primary CTA pair */}
-            <div className="mt-5 flex flex-wrap items-center gap-4">
-              <Button size="lg" onClick={hasProgress ? onContinue : onStart}>
+            {/* primary CTA pair — full-width stacked on small phones */}
+            <div className="mt-5 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
+              <Button size="lg" className="sm:w-auto w-full" onClick={hasProgress ? onContinue : onStart}>
                 {t(STRINGS.landing.startLearning, lang)}
               </Button>
               {/* real action: opens the learning path (command reference lives in levels) */}
-              <Button size="md" variant="secondary" onClick={onOpenMap}>
+              <Button size="md" variant="secondary" className="sm:w-auto w-full" onClick={onOpenMap}>
                 {t(STRINGS.landing.cheatSheet, lang)}
               </Button>
             </div>
           </div>
-          <div className="hidden sm:block px-6 pt-8">
+          {/* preview card below hero text on mobile, beside it on desktop */}
+          <div className="w-full px-1 sm:px-6 pt-8">
             <PreviewCard />
           </div>
         </div>

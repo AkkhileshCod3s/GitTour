@@ -102,7 +102,7 @@ export function Terminal({ lines, onCommand, onReset, commands, branches, lang }
         <span className="ml-2 font-display text-sm text-brut-ink truncate">{t(STRINGS.level.terminalTitle, lang)}</span>
         <button
           onClick={onReset}
-          className="focus-neon press-snap ml-auto font-display text-xs text-brut-ink bg-brut-ink text-lime border-2 border-theme rounded-brut px-3 py-1 shrink-0"
+          className="focus-neon press-snap ml-auto font-display text-xs text-brut-ink bg-brut-ink text-lime border-2 border-theme rounded-brut px-3 py-1.5 min-h-[36px] shrink-0"
           style={{ backgroundColor: 'rgb(var(--brut-bg))' }}
           title={t(STRINGS.level.restart, lang)}
         >
@@ -144,12 +144,16 @@ export function Terminal({ lines, onCommand, onReset, commands, branches, lang }
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKey}
-            className="w-full bg-transparent outline-none font-bold min-w-0 text-brut-ink"
+            className="w-full bg-transparent outline-none font-bold min-w-0 text-brut-ink py-2 text-base sm:text-[13px]"
             style={{ color: 'rgb(var(--ink-hi))' }}
             placeholder="git status"
             aria-label="terminal input"
             autoComplete="off"
             spellCheck={false}
+            autoCapitalize="off"
+            autoCorrect="off"
+            inputMode="text"
+            enterKeyHint="send"
           />
           {/* inline terminal caret: sits right after the typed text (mono font, so `ch` tracks it), not pinned to the row edge */}
           <span

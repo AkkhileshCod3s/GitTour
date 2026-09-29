@@ -93,7 +93,7 @@ export default function App() {
         onSettings={openSettings}
         onLang={setLang}
       />
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-16 md:pb-0">
         {/* screen-level fade+rise reveal; re-keyed per screen (and per level within
             the level screen) so it replays on every navigation.
             prefers-reduced-motion: animation disabled via CSS (instant appearance). */}

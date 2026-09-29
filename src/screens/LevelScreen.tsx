@@ -6,7 +6,7 @@ import { starRating, xpForLevel } from '../levels/scoring'
 import { emptyRepo } from '../git/repo'
 import type { Repo, GitContext, CommandResult } from '../git/types'
 import { registry } from '../git/registry'
-import { IconFlame, IconHome, IconMap, IconStarFilled } from '../ui/Icons'
+import { IconFlame, IconHome, IconMap, IconStarFilled, IconBook, IconGitBranch } from '../ui/Icons'
 import { StoryCard } from '../components/StoryCard'
 import { Terminal, type TerminalLine } from '../components/Terminal'
 import { CommitGraph } from '../components/CommitGraph'
@@ -35,6 +35,8 @@ interface Props {
 
 const WORLD_ACCENT: Record<number, string> = { 1: 'rgb(var(--lime))', 2: 'rgb(var(--lime))', 3: 'rgb(var(--lime))', 4: 'rgb(var(--danger))' }
 
+type MobileTab = 'task' | 'terminal' | 'graph'
+
 export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, onNext, hasNext }: Props) {
   const level = LEVELS.find((l) => l.id === levelId) ?? LEVELS[0]
   const world = WORLDS.find((w) => w.id === level.world) ?? WORLDS[0]
@@ -55,6 +57,7 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
   const [cmdCount, setCmdCount] = useState(0)
   const [lines, setLines] = useState<TerminalLine[]>([])
   const [ready, setReady] = useState(false)
+  const [mobileTab, setMobileTab] = useState<MobileTab>('terminal')
 
   const repoRef = useRef<Repo>(null as unknown as Repo)
   const ctxRef = useRef<GitContext>(null as unknown as GitContext)
@@ -77,6 +80,27 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
     setReady(true)
   }
   useEffect(resetLevel, [runKey, levelId])
+
+  // On mobile, always land on the terminal tab when a level opens/restarts.
+  useEffect(() => {
+    setMobileTab('terminal')
+  }, [levelId, runKey])
+
+  // Keep the active mobile tab's input visible above the on-screen keyboard:
+  // scroll the focused element into view when the visual viewport shrinks.
+  useEffect(() => {
+    if (window.innerWidth >= 768) return
+    const vv = window.visualViewport
+    if (!vv) return
+    const onResize = () => {
+      const el = document.activeElement as HTMLElement | null
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) {
+        setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 120)
+      }
+    }
+    vv.addEventListener('resize', onResize)
+    return () => vv.removeEventListener('resize', onResize)
+  }, [])
 
   const cmdNames = useMemo(() => [...new Set(registry.names())], [])
 
@@ -114,15 +138,22 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
   const repo = ready ? repoRef.current : null
   const branchNames = useMemo(() => Object.keys(repo?.branches ?? {}), [repo, cmdCount])
 
+  const tabBtn = (active: boolean) =>
+    `focus-neon press-snap flex items-center justify-center gap-1.5 flex-1 min-h-[44px] font-display text-xs sm:text-sm tracking-tight px-2 rounded-brut border-3 ${
+      active
+        ? 'bg-lime text-brut-ink border-brut-ink shadow-brut-xs font-bold'
+        : 'bg-brut-panel text-ink-hi border-theme'
+    }`
+
   return (
     <div className="h-full flex flex-col">
       {showBossIntro && <BossIntro title={title} accent={accent} lang={lang} onDone={() => setShowBossIntro(false)} />}
 
-      {/* in-level HUD: single Back-to-Home + single Map; global actions live in NavBar */}
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 bg-brut-panel border-b-3 border-theme">
+      {/* in-level HUD: compact on mobile (2 rows wrap), single row on desktop */}
+      <header className="flex flex-wrap items-center gap-x-2 gap-y-1.5 px-2 sm:px-3 py-2 bg-brut-panel border-b-3 border-theme">
         <button
           onClick={onHome}
-          className="focus-neon press-snap flex items-center gap-1.5 bg-brut-panel text-lime border-3 border-lime rounded-brut shadow-brut-sm px-3 py-1.5 font-display text-xs"
+          className="focus-neon press-snap flex items-center justify-center min-h-[40px] min-w-[40px] gap-1.5 bg-brut-panel text-lime border-3 border-lime rounded-brut shadow-brut-sm px-2.5 py-1.5 font-display text-xs"
           aria-label={t(STRINGS.hud.home, lang)}
           title={t(STRINGS.hud.home, lang)}
         >
@@ -131,7 +162,7 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
         </button>
         <button
           onClick={onExit}
-          className="focus-neon press-snap flex items-center gap-1.5 bg-brut-panel text-ink-hi border-3 border-theme rounded-brut shadow-brut-sm px-3 py-1.5 font-display text-xs"
+          className="focus-neon press-snap flex items-center justify-center min-h-[40px] min-w-[40px] gap-1.5 bg-brut-panel text-ink-hi border-3 border-theme rounded-brut shadow-brut-sm px-2.5 py-1.5 font-display text-xs"
           aria-label={t(STRINGS.hud.closeMap, lang)}
           title={t(STRINGS.hud.closeMap, lang)}
         >
@@ -139,8 +170,8 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
           <span className="hidden sm:inline">{t(STRINGS.hud.map, lang)}</span>
         </button>
         <div className="min-w-0">
-          <p className="font-display text-xs truncate max-w-[180px]" style={{ color: accent }}>{world.name}</p>
-          <h1 className="font-display text-sm truncate max-w-[240px] text-brut-ink" style={{ color: 'rgb(var(--ink-hi))' }} title={title}>{title}</h1>
+          <p className="font-display text-xs truncate max-w-[130px] sm:max-w-[180px]" style={{ color: accent }}>{world.name}</p>
+          <h1 className="font-display text-sm truncate max-w-[150px] sm:max-w-[240px] text-brut-ink" style={{ color: 'rgb(var(--ink-hi))' }} title={title}>{title}</h1>
         </div>
         <div className="flex items-center gap-1 ml-auto" title={t(STRINGS.hud.stars, lang)}>
           <IconStarFilled size={14} className="text-lime" />
@@ -152,9 +183,25 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
         </div>
       </header>
 
+      {/* mobile tab switcher (hidden on md+) */}
+      <div className="md:hidden flex items-center gap-2 px-2 py-2 bg-brut-bg shrink-0" role="tablist" aria-label="level panels">
+        <button role="tab" aria-selected={mobileTab === 'task'} onClick={() => setMobileTab('task')} className={tabBtn(mobileTab === 'task')}>
+          <IconBook size={15} />
+          <span className="truncate">{t(STRINGS.level.task, lang)}</span>
+        </button>
+        <button role="tab" aria-selected={mobileTab === 'terminal'} onClick={() => setMobileTab('terminal')} className={tabBtn(mobileTab === 'terminal')}>
+          <span className="font-mono font-bold">$</span>
+          <span className="truncate">Terminal</span>
+        </button>
+        <button role="tab" aria-selected={mobileTab === 'graph'} onClick={() => setMobileTab('graph')} className={tabBtn(mobileTab === 'graph')}>
+          <IconGitBranch size={15} />
+          <span className="truncate">{t(STRINGS.level.commitGraph, lang)}</span>
+        </button>
+      </div>
+
       <main className="flex-1 min-h-0 p-3 md:p-4 grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_320px]">
-        {/* left: story/task */}
-        <div className="min-h-0 lg:overflow-y-auto order-2 lg:order-1">
+        {/* left: story/task (mobile: tab) */}
+        <div className={`min-h-0 lg:overflow-y-auto order-2 lg:order-1 ${mobileTab === 'task' ? '' : 'hidden md:block'}`}>
           <Panel accent={accent} className="h-full">
             <StoryCard
               mood={mood}
@@ -167,8 +214,8 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
             />
           </Panel>
         </div>
-        {/* center: terminal */}
-        <div className="min-h-[280px] lg:min-h-0 order-1 lg:order-2">
+        {/* center: terminal (mobile: default tab, takes the main area) */}
+        <div className={`min-h-[280px] lg:min-h-0 order-1 lg:order-2 ${mobileTab === 'terminal' ? '' : 'hidden md:block'}`}>
           {repo ? (
             <Terminal
               lines={lines}
@@ -184,8 +231,8 @@ export function LevelScreen({ levelId, progress, lang, onWin, onExit, onHome, on
             </div>
           )}
         </div>
-        {/* right: graph + areas */}
-        <div className="min-h-0 lg:overflow-y-auto space-y-4 order-3">
+        {/* right: graph + areas (mobile: tab; areas stack vertically full-width) */}
+        <div className={`min-h-0 lg:overflow-y-auto space-y-4 order-3 ${mobileTab === 'graph' ? '' : 'hidden md:block'}`}>
           <Panel title={t(STRINGS.level.commitGraph, lang)} accent={accent}>
             {repo ? <CommitGraph repo={repo} accent={accent} lang={lang} /> : <p className="text-sm font-bold text-ink-low text-center py-4">...</p>}
           </Panel>
