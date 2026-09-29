@@ -1,29 +1,35 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'gold' | 'danger'
+  variant?: 'primary' | 'secondary' | 'utility' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   children: ReactNode
 }
 
+/**
+ * Locked button family (black + lime). All text/borders FULL opacity always;
+ * only genuine disabled states may dim (handled by disabled: utilities below).
+ */
 const styles: Record<string, string> = {
-  primary: 'bg-space-panel2 border-neon-cyan/60 text-neon-cyan hover:shadow-glow hover:border-neon-cyan',
-  secondary: 'bg-space-panel2 border-space-border text-ink-hi hover:border-neon-cyan/60 hover:text-neon-cyan',
-  gold: 'bg-space-panel2 border-gold/60 text-gold hover:shadow-glow-gold hover:border-gold',
-  danger: 'bg-space-panel2 border-danger/60 text-danger hover:shadow-[0_0_12px_rgba(248,113,113,.35)]',
+  primary:
+    'text-[#0A0A0A] border-[#0A0A0A] shadow-key bg-[linear-gradient(180deg,#C8FA57_0%,#B6F13A_45%,#8FD517_100%)] hover:shadow-[0_7px_0px_rgb(0_0_0/0.85),0_10px_18px_rgb(0_0_0/0.5)] active:shadow-[0_2px_0px_rgb(0_0_0/0.85)]',
+  secondary:
+    'bg-[#141416] text-[#B6F13A] border-[#B6F13A] shadow-key-sm hover:brightness-110 active:shadow-[0_1px_0px_rgb(0_0_0/0.85)]',
+  utility:
+    'bg-[#141416] text-[#F5F8F0] border-[#B6F13A] shadow-key-xs hover:brightness-110 active:shadow-[0_1px_0px_rgb(0_0_0/0.85)]',
+  danger: 'bg-[#FF6B70] text-[#0A0A0A] border-[#0A0A0A] shadow-key-xs font-bold',
 }
 
 const sizes: Record<string, string> = {
-  sm: 'px-2.5 py-1 text-[8px]',
-  md: 'px-4 py-2 text-[10px]',
-  lg: 'px-6 py-3 text-xs',
+  sm: 'px-3.5 py-1.5 text-sm',
+  md: 'px-5 py-2.5 text-base',
+  lg: 'px-8 py-4 text-lg',
 }
 
-/** Pixel-font game button with press-down effect. */
 export function Button({ variant = 'primary', size = 'md', className = '', children, ...rest }: Props) {
   return (
     <button
-      className={`focus-neon font-display border rounded-md transition-all duration-150 active:translate-y-[2px] disabled:opacity-40 disabled:cursor-not-allowed ${styles[variant]} ${sizes[size]} ${className}`}
+      className={`focus-neon press-snap inline-flex items-center justify-center gap-2 font-bold font-display tracking-tight border-3 rounded-brut disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:saturate-50 ${styles[variant]} ${sizes[size]} ${className}`}
       {...rest}
     >
       {children}

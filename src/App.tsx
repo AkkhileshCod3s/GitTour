@@ -4,37 +4,47 @@ import { WorldMap } from './screens/WorldMap'
 import { LevelScreen } from './screens/LevelScreen'
 import { BadgeGrid } from './screens/BadgeGrid'
 import { SettingsModal } from './screens/SettingsModal'
+import { NavBar } from './components/NavBar'
 import { LEVELS } from './levels/levels'
-import { loadProgress, saveProgress, clearProgress } from './storage'
+import { loadProgress, saveProgress, clearProgress, loadSettings, saveSettings, type AppSettings } from './storage'
 import { defaultProgress, touchStreak, type PlayerProgress } from './game/progress'
 import { setMuted } from './game/sound'
 import { Toast, type ToastData } from './ui/Toast'
 import { BADGES } from './game/achievements'
+import { t } from './i18n/strings'
+import { STRINGS } from './i18n/strings'
 
 type Screen = 'title' | 'map' | 'level' | 'profile'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('title')
   const [progress, setProgress] = useState<PlayerProgress>(() => loadProgress())
+  const [settings, setSettings] = useState<AppSettings>(() => loadSettings())
   const [levelId, setLevelId] = useState<string>('')
   const [toasts, setToasts] = useState<ToastData[]>([])
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  // persist on change + sync sound mute
   useEffect(() => {
     saveProgress(progress)
-    setMuted(!progress.soundOn)
+    setMuted(true)
   }, [progress])
+  useEffect(() => {
+    saveSettings(settings)
+    document.title = 'Git Tour — Timeline Repair Game'
+  }, [settings])
 
   const showToast = useCallback((title: string, text: string, icon: string) => {
     const id = Date.now() + Math.random()
-    setToasts((t) => [...t, { id, title, text, icon }])
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4200)
+    setToasts((t2) => [...t2, { id, title, text, icon }])
+    setTimeout(() => setToasts((t2) => t2.filter((x) => x.id !== id)), 4200)
   }, [])
 
-  const toggleSound = useCallback(() => {
-    setProgress((p) => ({ ...p, soundOn: !p.soundOn }))
-  }, [])
+  const setLang = useCallback((lang: AppSettings['lang']) => setSettings((s) => ({ ...s, lang })), [])
+
+  const goHome = useCallback(() => setScreen('title'), [])
+  const goMap = useCallback(() => setScreen('map'), [])
+  const goProfile = useCallback(() => setScreen('profile'), [])
+  const openSettings = useCallback(() => setSettingsOpen(true), [])
 
   const handleWin = useCallback(
     (id: string, stars: number, xp: number, hintsUsed: number): string[] => {
@@ -50,22 +60,20 @@ export default function App() {
         touchStreak(next)
         const lvl = LEVELS.find((l) => l.id === id)
         if (lvl) {
-          // import cycle avoided: badges computed inline
           newBadges = computeBadges(next, id, lvl.isBoss, lvl.world, hintsUsed, lvl)
         }
         next.badges = [...new Set([...p.badges, ...newBadges])]
         return next
       })
-      // toasts for new badges
       setTimeout(() => {
         for (const b of newBadges) {
           const def = BADGES.find((x) => x.id === b)
-          if (def) showToast('BADGE UNLOCKED!', def.name, '🏅')
+          if (def) showToast(t(STRINGS.toast.badgeUnlocked, settings.lang), def.name, 'medal')
         }
       }, 1400)
       return newBadges
     },
-    [showToast],
+    [showToast, settings.lang],
   )
 
   const nextLevelId = useMemo(() => {
@@ -74,86 +82,109 @@ export default function App() {
   }, [levelId])
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-space-bg text-ink-hi flex flex-col">
-      {screen === 'title' && (
-        <TitleScreen
-          hasProgress={progress.completed.length > 0}
-          onStart={() => {
-            setLevelId(LEVELS[0].id)
-            setScreen('level')
-          }}
-          onContinue={() => {
-            // first uncompleted level, else map
-            const next = LEVELS.find((l) => !progress.completed.includes(l.id))
-            if (next) {
-              setLevelId(next.id)
+    <div className="h-screen w-screen overflow-hidden bg-brut-bg text-ink-hi flex flex-col">
+      <NavBar
+        screen={screen}
+        lang={settings.lang}
+        progress={progress}
+        onHome={goHome}
+        onMap={goMap}
+        onProfile={goProfile}
+        onSettings={openSettings}
+        onLang={setLang}
+      />
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {/* screen-level fade+rise reveal; re-keyed per screen (and per level within
+            the level screen) so it replays on every navigation.
+            prefers-reduced-motion: animation disabled via CSS (instant appearance). */}
+        <div key={screen === 'level' ? `level-${levelId}` : screen} className="anim-screen h-full">
+        {screen === 'title' && (
+          <TitleScreen
+            hasProgress={progress.completed.length > 0}
+            progress={progress}
+            onStart={() => {
+              setLevelId(LEVELS[0].id)
               setScreen('level')
-            } else {
-              setScreen('map')
-            }
-          }}
-          onProfile={() => setScreen('profile')}
-          soundOn={progress.soundOn}
-          onToggleSound={toggleSound}
-        />
-      )}
+            }}
+            onContinue={() => {
+              const next = LEVELS.find((l) => !progress.completed.includes(l.id))
+              if (next) {
+                setLevelId(next.id)
+                setScreen('level')
+              } else {
+                setScreen('map')
+              }
+            }}
+            onOpenMap={goMap}
+            lang={settings.lang}
+          />
+        )}
 
-      {screen === 'map' && (
-        <WorldMap
-          levels={LEVELS}
-          progress={progress}
-          onPlay={(id) => {
-            setLevelId(id)
-            setScreen('level')
-          }}
-          onProfile={() => setScreen('profile')}
-          onTitle={() => setScreen('title')}
-        />
-      )}
+        {screen === 'map' && (
+          <WorldMap
+            levels={LEVELS}
+            progress={progress}
+            lang={settings.lang}
+            onPlay={(id) => {
+              setLevelId(id)
+              setScreen('level')
+            }}
+          />
+        )}
 
-      {screen === 'level' && levelId && (
-        <LevelScreen
-          key={levelId}
-          levelId={levelId}
-          progress={progress}
-          onWin={handleWin}
-          hasNext={nextLevelId !== null}
-          onNext={() => {
-            if (nextLevelId) {
-              setLevelId(nextLevelId)
-            } else {
-              setScreen('map')
-            }
-          }}
-          onExit={() => setScreen('map')}
-          soundOn={progress.soundOn}
-          onToggleSound={toggleSound}
-          onSettings={() => setSettingsOpen(true)}
-        />
-      )}
+        {screen === 'level' && levelId && (
+          <LevelScreen
+            key={levelId}
+            levelId={levelId}
+            progress={progress}
+            lang={settings.lang}
+            onWin={handleWin}
+            hasNext={nextLevelId !== null}
+            onNext={() => {
+              if (nextLevelId) {
+                setLevelId(nextLevelId)
+              } else {
+                setScreen('map')
+              }
+            }}
+            onExit={goMap}
+            onHome={() => {
+              if (confirm(t(STRINGS.hud.leaveConfirm, settings.lang))) {
+                setScreen('title')
+              }
+            }}
+          />
+        )}
 
-      {screen === 'profile' && (
-        <BadgeGrid
-          progress={progress}
-          levelsCount={LEVELS.length}
-          completedCount={progress.completed.length}
-          onBack={() => setScreen('map')}
-          onResetAll={() => {
-            if (confirm('Pakka? Sab progress delete ho jayega!')) {
-              clearProgress()
-              setProgress(defaultProgress())
-              setScreen('title')
-            }
-          }}
-        />
-      )}
+        {screen === 'profile' && (
+          <BadgeGrid
+            progress={progress}
+            levelsCount={LEVELS.length}
+            completedCount={progress.completed.length}
+            lang={settings.lang}
+            onResetAll={() => {
+              if (confirm(t(STRINGS.profile_confirm.reset, settings.lang))) {
+                clearProgress()
+                setProgress(defaultProgress())
+                setScreen('title')
+              }
+            }}
+          />
+        )}
+        </div>
+      </div>
 
-      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} soundOn={progress.soundOn} onToggleSound={toggleSound} />
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        lang={settings.lang}
+        onLang={setLang}
+      />
 
       {/* toast host */}
       <div className="fixed bottom-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none" aria-live="polite">
-        {toasts.map((t) => (
-          <Toast key={t.id} toast={t} />
+        {toasts.map((t2) => (
+          <Toast key={t2.id} toast={t2} />
         ))}
       </div>
     </div>

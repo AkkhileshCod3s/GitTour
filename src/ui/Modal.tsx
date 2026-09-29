@@ -21,27 +21,33 @@ export function Modal({ open, onClose, title, children, wide = false }: Props) {
   if (!open) return null
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'var(--scrim)' }}
       role="dialog"
       aria-modal="true"
       aria-label={title ?? 'dialog'}
       onClick={onClose}
     >
       <div
-        className={`bg-space-panel border border-neon-cyan/40 rounded-2xl shadow-glow-lg w-full ${wide ? 'max-w-2xl' : 'max-w-md'} max-h-[90vh] overflow-auto anim-pop`}
+        className={`bg-brut-panel border-4 border-theme rounded-brut-lg shadow-brut w-full ${wide ? 'max-w-2xl' : 'max-w-md'} max-h-[90vh] overflow-auto anim-pop`}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
-          <header className="px-4 py-3 border-b border-space-border flex items-center justify-between">
-            <h2 className="font-display text-[11px] text-neon-cyan">{title}</h2>
+          <header className="px-5 py-3 border-b-3 border-theme bg-lime flex items-center justify-between rounded-t-[10px]">
+            <h2 className="font-display text-lg text-brut-ink">{title}</h2>
             {onClose && (
-              <button onClick={onClose} className="focus-neon text-ink-mid hover:text-ink-hi text-lg leading-none" aria-label="close">
+              <button
+                onClick={onClose}
+                className="focus-neon press-snap w-9 h-9 flex items-center justify-center font-display font-bold text-brut-ink bg-brut-ink text-lime border-2 border-brut-ink rounded-brut"
+                style={{ backgroundColor: 'rgb(var(--brut-bg))' }}
+                aria-label="close"
+              >
                 ×
               </button>
             )}
           </header>
         )}
-        <div className="p-4">{children}</div>
+        <div className="p-5">{children}</div>
       </div>
     </div>
   )

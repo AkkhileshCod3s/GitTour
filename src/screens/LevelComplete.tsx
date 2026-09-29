@@ -3,12 +3,14 @@ import type { Level } from '../levels/worlds'
 import { Button } from '../ui/Button'
 import { StarRating } from '../ui/StarRating'
 import { Mascot } from '../components/Mascot'
+import { IconBook, IconCrown, IconMedal } from '../ui/Icons'
 import { BADGES } from '../game/achievements'
-import { ProgressBar } from '../ui/ProgressBar'
-import { rankForXp } from '../levels/scoring'
+import { t, STRINGS } from '../i18n/strings'
+import type { Lang } from '../storage'
 
 interface Props {
   level: Level
+  explanation: string
   stars: number
   xp: number
   badges: string[]
@@ -16,18 +18,19 @@ interface Props {
   onNext: () => void
   onRetry: () => void
   onExit: () => void
+  lang: Lang
 }
 
 function Confetti() {
   const bits = useMemo(
     () =>
-      Array.from({ length: 40 }, (_, i) => ({
+      Array.from({ length: 36 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
-        dur: Math.random() * 2.2 + 1.6,
-        delay: Math.random() * 0.7,
-        color: ['#22d3ee', '#e879f9', '#fbbf24', '#34d399'][i % 4],
-        size: Math.random() * 6 + 4,
+        dur: Math.random() * 2 + 1.4,
+        delay: Math.random() * 0.6,
+        color: ['var(--lime)', 'var(--lime)', 'var(--lime)', 'var(--danger)'][i % 4],
+        size: Math.random() * 8 + 6,
       })),
     [],
   )
@@ -36,12 +39,13 @@ function Confetti() {
       {bits.map((b) => (
         <span
           key={b.id}
-          className="absolute top-0 anim-confetti"
+          className="absolute top-0 anim-confetti border-2 border-brut-ink"
           style={{
             left: `${b.x}%`,
             width: b.size,
-            height: b.size * 0.6,
-            background: b.color,
+            height: b.size * 0.7,
+            borderRadius: b.id % 2 === 0 ? '999px' : '4px',
+            background: `rgb(${b.color})`,
             animationDuration: `${b.dur}s`,
             animationDelay: `${b.delay}s`,
           }}
@@ -51,43 +55,49 @@ function Confetti() {
   )
 }
 
-export function LevelComplete({ level, stars, xp, badges, hasNext, onNext, onRetry, onExit }: Props) {
+export function LevelComplete({ level, explanation, stars, xp, badges, hasNext, onNext, onRetry, onExit, lang }: Props) {
   const newBadges = BADGES.filter((b) => badges.includes(b.id))
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-label="level complete">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label="level complete" style={{ background: 'var(--scrim)' }}>
       <Confetti />
-      <div className="relative bg-space-panel border border-gold/50 rounded-2xl shadow-glow-gold max-w-md w-full p-6 text-center anim-pop max-h-[92vh] overflow-y-auto">
-        <div className="flex justify-center -mt-14 mb-1">
+      <div className="relative bg-brut-panel border-4 border-lime rounded-brut-lg shadow-brut max-w-md w-full p-6 text-center anim-pop max-h-[92vh] overflow-y-auto">
+        <div className="flex justify-center -mt-16 mb-1">
           <Mascot mood="happy" size={84} />
         </div>
-        <h2 className="font-display text-sm text-gold" style={{ textShadow: '0 0 14px rgba(251,191,36,.6)' }}>
-          {level.isBoss ? '👑 BOSS DEFEATED!' : 'TIMELINE REPAIRED!'}
+        <h2 className="font-display text-2xl text-lime">
+          {level.isBoss ? (
+            <span className="inline-flex items-center gap-2">
+              <IconCrown size={20} className="text-lime" />
+              {t(STRINGS.complete.bossBeaten, lang)}
+            </span>
+          ) : (
+            t(STRINGS.complete.repaired, lang)
+          )}
         </h2>
-        <p className="text-xs text-ink-mid mt-1">{level.title}</p>
+        <p className="text-sm text-ink-mid mt-1 font-bold">{level.title}</p>
 
         <div className="my-4 flex justify-center">
           <StarRating count={stars} size={34} animate />
         </div>
 
-        <div className="my-3">
-          <p className="font-display text-[9px] text-neon-cyan mb-1">+{xp} XP</p>
-          <ProgressBar value={Math.min(100, (rankForXp === undefined ? 0 : 0) + 100)} color="#fbbf24" height={6} />
-        </div>
+        <p className="font-display text-lg text-lime mb-3">+{xp} XP</p>
 
-        {/* Aaj kya seekha card */}
-        <div className="my-4 bg-space-bg/70 border border-space-border rounded-xl p-3 text-left">
-          <p className="text-[8px] font-display text-neon-cyan mb-1">📖 AAJ KYA SEEKHA</p>
-          <p className="text-xs text-ink-mid leading-relaxed">{level.explanationHinglish}</p>
+        <div className="my-4 bg-brut-shade border-3 border-theme rounded-brut p-3 text-left">
+          <p className="flex items-center gap-1.5 font-display text-sm text-lime mb-1">
+            <IconBook size={14} />
+            {t(STRINGS.complete.learned, lang)}
+          </p>
+          <p className="text-sm text-ink-mid leading-relaxed">{explanation}</p>
         </div>
 
         {newBadges.length > 0 && (
           <div className="my-4 space-y-2">
             {newBadges.map((b) => (
-              <div key={b.id} className="anim-toast flex items-center gap-2 bg-space-bg/70 border border-gold/40 rounded-lg px-3 py-2 text-left">
-                <span className="text-xl" aria-hidden="true">🏅</span>
-                <div>
-                  <p className="font-display text-[8px] text-gold">NEW BADGE: {b.name.toUpperCase()}</p>
-                  <p className="text-[11px] text-ink-mid">{b.desc}</p>
+              <div key={b.id} className="anim-toast flex items-center gap-2 bg-brut-bg border-3 border-theme rounded-brut px-3 py-2 text-left shadow-brut-xs">
+                <IconMedal size={20} className="text-lime shrink-0" />
+                <div className="min-w-0">
+                  <p className="font-display text-sm text-lime">{t(STRINGS.complete.newBadge, lang)}{b.name.toUpperCase()}</p>
+                  <p className="text-xs text-ink-mid">{b.desc}</p>
                 </div>
               </div>
             ))}
@@ -95,9 +105,9 @@ export function LevelComplete({ level, stars, xp, badges, hasNext, onNext, onRet
         )}
 
         <div className="flex flex-wrap justify-center gap-2 mt-4">
-          {hasNext && <Button variant="gold" onClick={onNext}>NEXT LEVEL ▶</Button>}
-          <Button variant="secondary" onClick={onRetry}>↻ RETRY (for stars)</Button>
-          <Button variant="secondary" onClick={onExit}>🗺 MAP</Button>
+          {hasNext && <Button variant="primary" onClick={onNext}>{t(STRINGS.complete.next, lang)}</Button>}
+          <Button variant="secondary" onClick={onRetry}>{t(STRINGS.complete.retry, lang)}</Button>
+          <Button variant="secondary" onClick={onExit}>{t(STRINGS.complete.map, lang)}</Button>
         </div>
       </div>
     </div>

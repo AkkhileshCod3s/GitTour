@@ -5,11 +5,11 @@ interface Props {
   height?: number
 }
 
-export function ProgressBar({ value, color = '#fbbf24', label, height = 10 }: Props) {
+export function ProgressBar({ value, color = 'rgb(var(--lime))', label, height = 18 }: Props) {
   const v = Math.max(0, Math.min(100, value))
   return (
     <div
-      className="w-full bg-space-bg border border-space-border rounded-full overflow-hidden relative"
+      className="w-full bg-brut-shade border-3 border-theme rounded-brut overflow-hidden relative"
       style={{ height }}
       role="progressbar"
       aria-valuenow={Math.round(v)}
@@ -17,12 +17,9 @@ export function ProgressBar({ value, color = '#fbbf24', label, height = 10 }: Pr
       aria-valuemax={100}
       aria-label={label ?? 'progress'}
     >
-      <div
-        className="h-full rounded-full transition-all duration-700 ease-out"
-        style={{ width: `${v}%`, background: `linear-gradient(90deg, ${color}88, ${color})`, boxShadow: `0 0 8px ${color}` }}
-      />
+      <div className="h-full transition-all duration-500 ease-out" style={{ width: `${v}%`, backgroundColor: color }} />
       {label && (
-        <span className="absolute inset-0 flex items-center justify-center text-[7px] font-display text-ink-hi">
+        <span className="absolute inset-0 flex items-center justify-center text-xs font-display text-brut-ink" style={{ color: 'rgb(var(--ink-hi))' }}>
           {label}
         </span>
       )}

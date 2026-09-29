@@ -4,23 +4,44 @@ export default {
   theme: {
     extend: {
       colors: {
-        space: { bg: '#0b0f1a', panel: '#111a2e', panel2: '#182543', border: '#24335c' },
-        neon: { cyan: '#22d3ee', magenta: '#e879f9', amber: '#fbbf24', green: '#34d399' },
-        gold: '#fbbf24',
-        danger: '#f87171',
-        ink: { hi: '#e2e8f0', mid: '#94a3b8', low: '#64748b' },
+        brut: {
+          bg: 'rgb(var(--brut-bg) / <alpha-value>)',
+          ink: 'rgb(var(--brut-ink) / <alpha-value>)',
+          panel: 'rgb(var(--brut-panel) / <alpha-value>)',
+          shade: 'rgb(var(--brut-shade) / <alpha-value>)',
+        },
+        lime: 'rgb(var(--lime) / <alpha-value>)',
+        limedeep: 'rgb(var(--lime-deep) / <alpha-value>)',
+        gold: 'rgb(var(--gold) / <alpha-value>)',
+        danger: 'rgb(var(--danger) / <alpha-value>)',
+        sky: 'rgb(var(--sky) / <alpha-value>)',
+        ink: {
+          hi: 'rgb(var(--ink-hi) / <alpha-value>)',
+          mid: 'rgb(var(--ink-mid) / <alpha-value>)',
+          low: 'rgb(var(--ink-low) / <alpha-value>)',
+        },
       },
       fontFamily: {
-        display: ['"Press Start 2P"', 'monospace'],
+        display: ['"Archivo Black"', '"Space Grotesk"', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
-        sans: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      borderRadius: {
+        brut: '18px',
+        'brut-lg': '20px',
+      },
+      borderWidth: {
+        3: '3px',
+        4: '4px',
       },
       boxShadow: {
-        glow: '0 0 12px rgba(34,211,238,.35)',
-        'glow-lg': '0 0 28px rgba(34,211,238,.5)',
-        'glow-gold': '0 0 16px rgba(251,191,36,.45)',
-        'glow-magenta': '0 0 16px rgba(232,121,249,.4)',
-        'glow-green': '0 0 16px rgba(52,211,153,.4)',
+        /* 3D key-cap: soft bottom-heavy, not flat offset */
+        key: '0 5px 0px rgb(0 0 0 / 0.85), 0 7px 14px rgb(0 0 0 / 0.45)',
+        'key-sm': '0 3px 0px rgb(0 0 0 / 0.8), 0 4px 8px rgb(0 0 0 / 0.35)',
+        'key-xs': '0 2px 0px rgb(0 0 0 / 0.75), 0 3px 6px rgb(0 0 0 / 0.3)',
+        brut: '0 5px 0px rgb(0 0 0 / 0.85), 0 7px 14px rgb(0 0 0 / 0.45)',
+        'brut-sm': '0 3px 0px rgb(0 0 0 / 0.8), 0 4px 8px rgb(0 0 0 / 0.35)',
+        'brut-xs': '0 2px 0px rgb(0 0 0 / 0.75), 0 3px 6px rgb(0 0 0 / 0.3)',
       },
     },
   },

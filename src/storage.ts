@@ -2,6 +2,17 @@ import type { PlayerProgress } from './game/progress'
 import { defaultProgress } from './game/progress'
 
 const KEY = 'git-time-traveler-progress-v1'
+const SETTINGS_KEY = 'git-tour-settings-v1'
+
+export type Lang = 'hinglish' | 'english'
+
+export interface AppSettings {
+  lang: Lang
+}
+
+export function defaultSettings(): AppSettings {
+  return { lang: 'hinglish' }
+}
 
 /** ALL localStorage access lives here only. Every call wrapped in try/catch. */
 export function loadProgress(): PlayerProgress {
@@ -9,7 +20,6 @@ export function loadProgress(): PlayerProgress {
     const raw = localStorage.getItem(KEY)
     if (!raw) return defaultProgress()
     const parsed = JSON.parse(raw) as Partial<PlayerProgress>
-    // graceful merge over defaults (handles corrupt/partial data)
     const d = defaultProgress()
     return {
       xp: typeof parsed.xp === 'number' ? parsed.xp : d.xp,
@@ -37,6 +47,27 @@ export function saveProgress(p: PlayerProgress): void {
 export function clearProgress(): void {
   try {
     localStorage.removeItem(KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
+export function loadSettings(): AppSettings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY)
+    if (!raw) return defaultSettings()
+    const parsed = JSON.parse(raw) as Partial<AppSettings>
+    return {
+      lang: parsed.lang === 'english' ? 'english' : 'hinglish',
+    }
+  } catch {
+    return defaultSettings()
+  }
+}
+
+export function saveSettings(s: AppSettings): void {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s))
   } catch {
     /* ignore */
   }

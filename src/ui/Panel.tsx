@@ -7,22 +7,19 @@ interface Props {
   children: ReactNode
 }
 
-/** Rounded glowing panel used everywhere. */
-export function Panel({ title, accent = '#22d3ee', className = '', children }: Props) {
+/** Charcoal panel, crisp border, hard shadow. */
+export function Panel({ title, accent, className = '', children }: Props) {
   return (
     <section
-      className={`bg-space-panel/80 border rounded-xl backdrop-blur-sm ${className}`}
-      style={{ borderColor: accent + '55', boxShadow: `0 0 14px ${accent}22` }}
+      className={`bg-brut-panel border-3 border-theme rounded-brut-lg shadow-brut ${className}`}
+      style={accent ? { borderTop: `5px solid ${accent}` } : undefined}
     >
       {title && (
-        <header
-          className="px-3 py-2 border-b text-[9px] font-display tracking-wider"
-          style={{ borderColor: accent + '33', color: accent }}
-        >
-          {title}
+        <header className="px-4 py-2 border-b-3 border-theme">
+          <span className="font-display text-sm text-lime">{title}</span>
         </header>
       )}
-      <div className="p-3">{children}</div>
+      <div className="p-4">{children}</div>
     </section>
   )
 }

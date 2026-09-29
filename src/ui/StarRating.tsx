@@ -1,31 +1,25 @@
 interface Props {
   count: number // 0..3
   size?: number
-  animate?: boolean // animate stars one by one
+  animate?: boolean
   color?: string
 }
 
-/** SVG star; filled count shown; scale-in bounce when animate=true. */
-export function StarRating({ count, size = 18, animate = false, color = '#fbbf24' }: Props) {
+export function StarRating({ count, size = 26, animate = false, color }: Props) {
+  const fill = color ?? 'rgb(var(--lime))'
+  const empty = 'rgb(var(--brut-shade))'
   return (
-    <span role="img" aria-label={`${count} of 3 stars`} className="inline-flex gap-1">
+    <span role="img" aria-label={`${count} of 3 stars`} className="inline-flex gap-1.5">
       {[0, 1, 2].map((i) => {
         const filled = i < count
         return (
-          <svg
-            key={i}
-            width={size}
-            height={size}
-            viewBox="0 0 24 24"
-            className={animate && filled ? 'anim-star' : undefined}
-            style={animate ? { animationDelay: `${i * 0.45}s` } : undefined}
-            aria-hidden="true"
-          >
+          <svg key={i} width={size} height={size} viewBox="0 0 24 24" className={animate && filled ? 'anim-star' : undefined} style={animate ? { animationDelay: `${i * 0.3}s` } : undefined} aria-hidden="true">
             <path
-              d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"
-              fill={filled ? color : 'none'}
-              stroke={filled ? color : '#475569'}
-              strokeWidth="1.6"
+              d="M12 2.5l2.8 6 6.6.8-4.9 4.5 1.3 6.5L12 17.2 6.2 20.3l1.3-6.5L2.6 9.3l6.6-.8z"
+              fill={filled ? fill : empty}
+              stroke={filled ? '#0A0A0A' : 'rgb(var(--border-c))'}
+              strokeWidth="1.8"
+              strokeLinejoin="round"
             />
           </svg>
         )
