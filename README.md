@@ -1,4 +1,4 @@
-# Git Time Traveler 🕹⏳
+# Git Tour🕹⏳
 
 Ek browser-based **game** jo Git sikhata hai — fake terminal mein commands type karo, live commit graph dekho, timelines repair karo. No backend, no real Git — kuch bhi nahi tootega.
 
